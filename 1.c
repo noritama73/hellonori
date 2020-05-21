@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define min(a, b) (((a) < (b)) ? (a) : (b))
 int i;
 
 typedef struct cell
@@ -15,6 +14,7 @@ int allocate_object(cl *L, int *f);
 void list_insert(cl *L, int *head, int p, int new);
 void list_delete(cl *L, int *head, int a);
 void free_object(cl *L, int *f, int x);
+int list_minimum(cl *L, int *head);
 
 int main(void)
 {
@@ -44,9 +44,15 @@ int main(void)
     for (i = 0; i < 50; i++)
     {
         if (i == 0)
+        {
             List[i].prev = -1;
+            List[i].next = 1;
+        }
         else if (i == 49)
+        {
+            List[i].prev = 48;
             List[i].next = -1;
+        }
         else
         {
             List[i].prev = i - 1;
@@ -68,14 +74,10 @@ int main(void)
     int mini;
     for (i = 0; i < n; i++)
     {
-        mini = INT_MAX;
-        for (int j = 0; j < n; j++)
-        {
-            mini = min(mini, (List + j)->key);
-        }
+        mini = list_minimum(List, &head);
         Data[i] = mini;
-        free_object(List, &freeL, mini);
         list_delete(List, &head, mini);
+        free_object(List, &freeL, mini);
     }
     printf("ソートが完了しました。\n");
 
@@ -115,7 +117,7 @@ void list_insert(cl *L, int *head, int p, int new)
 
 void list_delete(cl *L, int *head, int a)
 {
-    int x = a;
+    int x = *head;
     while (x != -1 && L[x].key != a)
     {
         x = L[x].next;
@@ -143,4 +145,22 @@ void free_object(cl *L, int *f, int x)
 {
     L[x].next = *f;
     *f = x;
+}
+
+int list_minimum(cl *L, int *head)
+{
+    int x, y;
+    x = *head;
+    y = x;
+    int max = INT_MAX;
+    while (x != -1)
+    {
+        if (L[x].key > max)
+        {
+            max = L[x].key;
+            y = x;
+        }
+        x = L[x].next;
+    }
+    return y;
 }
