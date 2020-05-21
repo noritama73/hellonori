@@ -78,6 +78,7 @@ int main(void)
         Data[i] = mini;
         list_delete(List, &head, mini);
         free_object(List, &freeL, mini);
+        printf("%d番目までソートしました。:%d\n", i + 1, Data[i]);
     }
     printf("ソートが完了しました。\n");
 
@@ -129,7 +130,7 @@ void list_delete(cl *L, int *head, int a)
         if (p != -1)
         {
             L[p].next = q;
-            if (q != 1)
+            if (q != -1)
                 L[q].prev = p;
         }
         else
@@ -152,12 +153,12 @@ int list_minimum(cl *L, int *head)
     int x, y;
     x = *head;
     y = x;
-    int max = INT_MAX;
+    int min = INT_MAX;
     while (x != -1)
     {
-        if (L[x].key > max)
+        if (L[x].key < min)
         {
-            max = L[x].key;
+            min = L[x].key;
             y = x;
         }
         x = L[x].next;
