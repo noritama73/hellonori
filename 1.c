@@ -24,7 +24,7 @@ int main(void)
     int N;          /* 数値の数は N */
     int Data[50];   /* 数値を格納する配列は Data */
     int i;
-    FILE *fp;                    /* ファイル名は 128 文字まで対応可能にする */
+    FILE *fp;
     fp = fopen("data.txt", "r"); /* ファイルを読み込みモードで開く */
     fscanf(fp, "%d", &N);        /* N をファイルから読み込む */
     if (N > 50)
@@ -37,7 +37,7 @@ int main(void)
         fscanf(fp, "%d", &Data[i]); /* 整数値を順に読み込み，Data に格納する */
     }
     fclose(fp); /* 開いたファイルを閉じる */
-    printf("ファイルを読み込みました。\n");
+
     Tree = NULL; /* Tree の初期化，最初は空 */
     /* Tree は２分探索木の根を指す*/
     for (i = 0; i < N; i++)
@@ -48,11 +48,12 @@ int main(void)
         Tree = tree_insert(Tree, x); /* x を Tree に挿入して根の情報を更新*/
         tree_show(Tree, Tree);
     }
-    printf("データの格納が完了しました。\n");
+
     for (i = 0; i < N; i++)
     { /* データ削除部分のくりかえし */
         z = tree_search(Tree, Data[i]);
-        tree_delete(Tree, z);
+        //printf("Delete:%d\n", z->key);
+        Tree = tree_delete(Tree, z);
         tree_show(Tree, Tree);
     }
 }
@@ -130,7 +131,10 @@ nod *tree_delete(nod *T, nod *z)
     p = y->parent;
 
     if (y->right != NULL || y->left != NULL)
+    {
         x = (y->left != NULL ? y->left : y->right);
+        x->parent = p;
+    }
     else
         x = NULL;
 
@@ -147,8 +151,6 @@ nod *tree_delete(nod *T, nod *z)
     if (y != z)
         z->key = y->key;
 
-    free(y);
-
     return (T);
 }
 
@@ -157,7 +159,7 @@ void inorder_tree_walk(nod *x)
     if (x != NULL)
     {
         inorder_tree_walk(x->left);
-        printf(" %d", x->key);
+        printf("%d ", x->key);
         inorder_tree_walk(x->right);
     }
 }
@@ -167,5 +169,5 @@ void tree_show(nod *T, nod *x)
     inorder_tree_walk(x);
     printf("\n");
     nod *MAX = tree_maximum(T, x), *MIN = tree_minimum(T, x);
-    printf("MAX:%d, MIN:%d\n", MAX->key, MIN->key);
+    printf("MAX:%d, MIN:%d\n\n", MAX->key, MIN->key);
 }
