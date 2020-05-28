@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NIL -1
-
 typedef struct node
 {
     int key;
@@ -62,7 +60,7 @@ int main(void)
 nod *tree_search(nod *T, int a)
 {
     nod *x = T;
-    while (x != NIL && x->key != a)
+    while (x != NULL && x->key != a)
     {
         if (a < x->key)
             x = x->left;
@@ -75,7 +73,7 @@ nod *tree_search(nod *T, int a)
 
 nod *tree_minimum(nod *T, nod *x)
 {
-    while (x->left != NIL)
+    while (x->left != NULL)
     {
         x = x->left;
     }
@@ -85,7 +83,7 @@ nod *tree_minimum(nod *T, nod *x)
 
 nod *tree_maximum(nod *T, nod *x)
 {
-    while (x->right != NIL)
+    while (x->right != NULL)
     {
         x = x->right;
     }
@@ -100,7 +98,7 @@ nod *tree_insert(nod *T, nod *x)
     y = NULL;
     z = r;
 
-    while (z != NIL)
+    while (z != NULL)
     {
         if (x->key < z->key)
             y = z, z = z->left;
@@ -110,12 +108,12 @@ nod *tree_insert(nod *T, nod *x)
 
     x->parent = y;
 
-    if (y == NIL)
+    if (y == NULL)
         r = x;
     else if (y->key < x->key)
-        y->right = x->key;
+        y->right = x;
     else
-        y->left = x->left;
+        y->left = x;
 
     return (r);
 }
@@ -134,9 +132,9 @@ nod *tree_delete(nod *T, nod *z)
     if (y->right != NULL || y->left != NULL)
         x = (y->left != NULL ? y->left : y->right);
     else
-        x = NIL;
+        x = NULL;
 
-    if (p == NIL)
+    if (p == NULL)
         T = x;
     else
     {
@@ -168,5 +166,6 @@ void tree_show(nod *T, nod *x)
 {
     inorder_tree_walk(x);
     printf("\n");
-    printf("MAX:%d, MIN:%d\n", *tree_maximum(T, x), *tree_minimum(T, x));
+    nod *MAX = tree_maximum(T, x), *MIN = tree_minimum(T, x);
+    printf("MAX:%d, MIN:%d\n", MAX->key, MIN->key);
 }
