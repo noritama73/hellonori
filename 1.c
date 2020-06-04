@@ -1,173 +1,122 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define left(i) (2 * (i) + 1)
+#define right(i) (2 * (i) + 2)
 
-typedef struct node
-{
-    int key;
-    struct node *parent;
-    struct node *left;
-    struct node *right;
-} nod;
+int i;
 
-nod *tree_search(nod *T, int a);
-nod *tree_minimum(nod *T, nod *x);
-nod *tree_maximum(nod *T, nod *x);
-nod *tree_insert(nod *T, nod *x);
-nod *tree_delete(nod *T, nod *z);
-void inorder_tree_walk(nod *x);
-void tree_show(nod *T, nod *x);
+void swap(int *a, int *b);
+int parent(int j);
+void heapsort(int *A, int n);
+void build_heap(int *A, int n);
+void up_heap_sort(int *A, int j);
+void down_heap_sort(int *A, int j);
 
 int main(void)
 {
-    nod *Tree;      /* ２分探索木を表す変数は Tree */
-    nod *x, *y, *z; /* 挿入，削除等に用いる node 型変数 */
-    int N;          /* 数値の数は N */
-    int Data[50];   /* 数値を格納する配列は Data */
-    int i;
+    int Data[50]; /* 数値を格納する配列， 50 まで */
+    int N;        
     FILE *fp;
-    fp = fopen("data.txt", "r"); /* ファイルを読み込みモードで開く */
-    fscanf(fp, "%d", &N);        /* N をファイルから読み込む */
-    if (N > 50)
-    {
-        printf("N is too large, setting N = 50\n");
-        N = 50; /* N が 50 を超えるときは警告をした上で */
-    }           /* N =50 に設定する */
+
+    fp = fopen("data.txt", "r");
+    fscanf(fp, "%d", &N);
     for (i = 0; i < N; i++)
     {
-        fscanf(fp, "%d", &Data[i]); /* 整数値を順に読み込み，Data に格納する */
+        fscanf(fp, "%d", &Data[i]);
     }
-    fclose(fp); /* 開いたファイルを閉じる */
+    fclose(fp);
 
-    Tree = NULL; /* Tree の初期化，最初は空 */
-    /* Tree は２分探索木の根を指す*/
+    printf("Unsorted:\n");
     for (i = 0; i < N; i++)
-    { /* データ挿入部分のくりかえし */
-        x = (nod *)malloc(sizeof(nod));
-        x->key = Data[i]; /* 新しい頂点 x を生成して key などを指定 */
-        x->parent = x->left = x->right = NULL;
-        Tree = tree_insert(Tree, x); /* x を Tree に挿入して根の情報を更新*/
-        tree_show(Tree, Tree);
-    }
-
-    for (i = 0; i < N; i++)
-    { /* データ削除部分のくりかえし */
-        z = tree_search(Tree, Data[i]);
-        //printf("Delete:%d\n", z->key);
-        Tree = tree_delete(Tree, z);
-        tree_show(Tree, Tree);
-    }
-}
-
-nod *tree_search(nod *T, int a)
-{
-    nod *x = T;
-    while (x != NULL && x->key != a)
     {
-        if (a < x->key)
-            x = x->left;
-        else
-            x = x->right;
+        printf("%d ", Data[i]); /* ソート前の数値の出力 */
     }
-
-    return x;
-}
-
-nod *tree_minimum(nod *T, nod *x)
-{
-    while (x->left != NULL)
-    {
-        x = x->left;
-    }
-
-    return (x);
-}
-
-nod *tree_maximum(nod *T, nod *x)
-{
-    while (x->right != NULL)
-    {
-        x = x->right;
-    }
-
-    return (x);
-}
-
-nod *tree_insert(nod *T, nod *x)
-{
-    nod *r, *y, *z;
-    r = T; /* 根を変数 r に格納 */
-    y = NULL;
-    z = r;
-
-    while (z != NULL)
-    {
-        if (x->key < z->key)
-            y = z, z = z->left;
-        else
-            y = z, z = z->right;
-    }
-
-    x->parent = y;
-
-    if (y == NULL)
-        r = x;
-    else if (y->key < x->key)
-        y->right = x;
-    else
-        y->left = x;
-
-    return (r);
-}
-
-nod *tree_delete(nod *T, nod *z)
-{
-    nod *x, *y, *p;
-
-    if (z->left == NULL || z->right == NULL)
-        y = z;
-    else
-        y = tree_minimum(T, z->right);
-
-    p = y->parent;
-
-    if (y->right != NULL || y->left != NULL)
-    {
-        x = (y->left != NULL ? y->left : y->right);
-        x->parent = p;
-    }
-    else
-        x = NULL;
-
-    if (p == NULL)
-        T = x;
-    else
-    {
-        if (p->key < y->key)
-            p->right = x;
-        else
-            p->left = x;
-    }
-
-    if (y != z)
-        z->key = y->key;
-
-    return (T);
-}
-
-void inorder_tree_walk(nod *x)
-{
-    if (x != NULL)
-    {
-        inorder_tree_walk(x->left);
-        printf("%d ", x->key);
-        inorder_tree_walk(x->right);
-    }
-}
-
-void tree_show(nod *T, nod *x)
-{
-    inorder_tree_walk(x);
     printf("\n");
-    nod *MAX = tree_maximum(T, x), *MIN = tree_minimum(T, x);
-    printf("MAX:%d, MIN:%d\n\n", MAX->key, MIN->key);
+
+    heapsort(Data, N); /* ヒープソートを呼ぶ */
+
+    printf("Sorted:\n");
+    for (i = 0; i < N; i++)
+    {
+        printf("%d ", Data[i]); /* ソート後の数値の出力 */
+    }
+    printf("\n");
+
+    return 0;
+}
+
+void swap(int *a, int *b)
+{
+    int temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int parent(int j)
+{
+    return (j - 1) / 2;
+}
+
+void heapsort(int *A, int n)
+{
+    build_heap(A, n);
+    for (i = 1; i < n; i++)
+    {
+        swap(&A[n - i], &A[0]);
+        down_heap_sort(A, n - i - 1);
+    }
+}
+
+void build_heap(int *A, int n)
+{
+    for (i = 1; i < n; i++)
+    {
+        up_heap_sort(A, i);
+    }
+}
+
+void up_heap_sort(int *A, int j)
+{
+    int u = j;
+    while (u > 0 && A[parent(u)] < A[u])
+    {
+        swap(&A[u], &A[parent(u)]);
+        u = parent(u);
+    }
+}
+
+void down_heap_sort(int *A, int j)
+{
+    int u = 0;
+    int l, r;
+
+    for (;;)
+    {
+        if (left(u) <= j)
+            l = left(u);
+        else
+            l = u;
+
+        if (right(u) <= j)
+            r = right(u);
+        else
+            r = u;
+
+        if (A[l] == A[r])
+            break;
+        else
+        {
+            if (A[l] > A[r])
+            {
+                swap(&A[l], &A[u]);
+                u = l;
+            }
+            else
+            {
+                swap(&A[r], &A[u]);
+                u = r;
+            }
+        }
+    }
 }
